@@ -96,6 +96,31 @@ function New-RuntimeAssemblyDefinition($Path, $OrganizationDisplayName, $Package
     New-Item -Path $Path -Name "$($Name).asmdef" -ItemType File -Value $Content -Force
 }
 
+function New-EditorAssemblyDefinition($Path, $OrganizationDisplayName, $PackageDisplayName) {
+    $Name = "$($OrganizationDisplayName).$($PackageDisplayName).Editor"
+    $Content = @"
+{
+    `"name`": `"$($Name)`",
+    `"rootNamespace`": `"$($Name)`",
+    `"references`": [],
+    `"includePlatforms`": [
+        `"Editor`"
+    ],
+    `"excludePlatforms`": [],
+    `"allowUnsafeCode`": false,
+    `"overrideReferences`": false,
+    `"precompiledReferences`": [],
+    `"autoReferenced`": true,
+    `"defineConstraints`": [],
+    `"versionDefines`": [],
+    `"noEngineReferences`": false
+}
+
+"@
+
+    New-Item -Path $Path -Name "$($Name).asmdef" -ItemType File -Value $Content -Force
+}
+
 # Setup configuration is defined in a single setup.json file
 $Config = Get-Content ./setup.json | ConvertFrom-Json
 
@@ -108,3 +133,4 @@ New-ReadMe -Path $ProjectRoot -PackageName $Config.package.displayName -PackageD
 New-License -Path $ProjectRoot -CopyrightYear $CurrentYear -CopyrightBearer $Config.author.name
 New-PackageJson -Path $ProjectRoot -OrganizationName $Config.organization.name -PackageName $Config.package.name -Version $Config.package.version
 New-RuntimeAssemblyDefinition -Path "$ProjectRoot\Runtime" -OrganizationDisplayName ($Config.organization.displayName -replace ' ','') -PackageDisplayName ($Config.package.displayName -replace ' ','')
+New-EditorAssemblyDefinition -Path "$ProjectRoot\Editor" -OrganizationDisplayName ($Config.organization.displayName -replace ' ','') -PackageDisplayName ($Config.package.displayName -replace ' ','')
