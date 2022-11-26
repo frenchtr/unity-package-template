@@ -50,13 +50,153 @@ function New-PackageJson($Path, $OrganizationName, $PackageName, $Version) {
     New-Item -Path $Path -Name package.json -ItemType File -Value $Content -Force
 }
 
+function New-RuntimeAssemblyDefinition($Path, $OrganizationName, $PackageName) {
+    $Name = "$($OrganizationName).$($PackageName).Runtime"
+    $Content = @"
+{
+    `"name`": `"$($Name)`",
+    `"rootNamespace`": `"$($Name)`",
+    `"references`": [],
+    `"includePlatforms`": [],
+    `"excludePlatforms`": [],
+    `"allowUnsafeCode`": false,
+    `"overrideReferences`": false,
+    `"precompiledReferences`": [],
+    `"autoReferenced`": true,
+    `"defineConstraints`": [],
+    `"versionDefines`": [],
+    `"noEngineReferences`": false
+}
+
+"@
+
+    New-Item -Path $Path -Name "$($Name).asmdef" -ItemType File -Value $Content -Force
+}
+
+function New-RuntimeAssemblyDefinition($Path, $OrganizationName, $PackageName) {
+    $Name = "$($OrganizationName).$($PackageName).Runtime"
+    $Content = @"
+{
+    `"name`": `"$($Name)`",
+    `"rootNamespace`": `"$($Name)`",
+    `"references`": [],
+    `"includePlatforms`": [],
+    `"excludePlatforms`": [],
+    `"allowUnsafeCode`": false,
+    `"overrideReferences`": false,
+    `"precompiledReferences`": [],
+    `"autoReferenced`": true,
+    `"defineConstraints`": [],
+    `"versionDefines`": [],
+    `"noEngineReferences`": false
+}
+
+"@
+
+    New-Item -Path $Path -Name "$($Name).asmdef" -ItemType File -Value $Content -Force
+}
+
+function New-EditorAssemblyDefinition($Path, $OrganizationName, $PackageName) {
+    $Name = "$($OrganizationName).$($PackageName).Editor"
+    $Content = @"
+{
+    `"name`": `"$($Name)`",
+    `"rootNamespace`": `"$($Name)`",
+    `"references`": [],
+    `"includePlatforms`": [
+        `"Editor`"
+    ],
+    `"excludePlatforms`": [],
+    `"allowUnsafeCode`": false,
+    `"overrideReferences`": false,
+    `"precompiledReferences`": [],
+    `"autoReferenced`": true,
+    `"defineConstraints`": [],
+    `"versionDefines`": [],
+    `"noEngineReferences`": false
+}
+
+"@
+
+    New-Item -Path $Path -Name "$($Name).asmdef" -ItemType File -Value $Content -Force
+}
+
+function New-EditorTestsAssemblyDefinition($Path, $OrganizationName, $PackageName) {
+    $Name = "$($OrganizationName).$($PackageName).Tests.Editor"
+    $Content = @"
+{
+    `"name`": `"$($Name)`",
+    `"rootNamespace`": `"$($Name)`",
+    `"references`": [
+        `"UnityEngine.TestRunner`",
+        `"UnityEditor.TestRunner`"
+    ],
+    `"includePlatforms`": [
+        `"Editor`"
+    ],
+    `"excludePlatforms`": [],
+    `"allowUnsafeCode`": false,
+    `"overrideReferences`": true,
+    `"precompiledReferences`": [
+        `"nunit.framework.dll`"
+    ],
+    `"autoReferenced`": false,
+    `"defineConstraints`": [
+        `"UNITY_INCLUDE_TESTS`"
+    ],
+    `"versionDefines`": [],
+    `"noEngineReferences`": false
+}
+
+"@
+
+    New-Item -Path $Path -Name "$($Name).asmdef" -ItemType File -Value $Content -Force
+}
+
+function New-RuntimeTestsAssemblyDefinition($Path, $OrganizationName, $PackageName) {
+    $Name = "$($OrganizationName).$($PackageName).Tests.Runtime"
+    $Content = @"
+{
+    `"name`": `"$($Name)`",
+    `"rootNamespace`": `"$($Name)`",
+    `"references`": [
+        `"UnityEngine.TestRunner`",
+        `"UnityEditor.TestRunner`"
+    ],
+    `"includePlatforms`": [],
+    `"excludePlatforms`": [],
+    `"allowUnsafeCode`": false,
+    `"overrideReferences`": true,
+    `"precompiledReferences`": [
+        `"nunit.framework.dll`"
+    ],
+    `"autoReferenced`": false,
+    `"defineConstraints`": [
+        `"UNITY_INCLUDE_TESTS`"
+    ],
+    `"versionDefines`": [],
+    `"noEngineReferences`": false
+}
+
+"@
+
+    New-Item -Path $Path -Name "$($Name).asmdef" -ItemType File -Value $Content -Force
+}
+
 # Setup configuration is defined in a single setup.json file
 $Config = Get-Content ./setup.json | ConvertFrom-Json
 
 # Shared variables
+$ProjectRoot = $PSScriptRoot
 $CurrentYear = (Get-Date | Select-Object -ExpandProperty Year)
+$AssemblyDefinitionOrganizationName = ($Config.organization.displayName -replace ' ','')
+$AssemblyDefinitionPackageName = ($Config.package.displayName -replace ' ','')
 
 # Procedure logic
-New-ReadMe -Path $PSScriptRoot -PackageName $Config.package.displayName -PackageDescription $Config.package.description
-New-License -Path $PSScriptRoot -CopyrightYear $CurrentYear -CopyrightBearer $Config.author.name
-New-PackageJson -Path $PSScriptRoot -OrganizationName $Config.organization.name -PackageName $Config.package.name -Version $Config.package.version
+New-ReadMe -Path $ProjectRoot -PackageName $Config.package.displayName -PackageDescription $Config.package.description
+New-License -Path $ProjectRoot -CopyrightYear $CurrentYear -CopyrightBearer $Config.author.name
+New-PackageJson -Path $ProjectRoot -OrganizationName $Config.organization.name -PackageName $Config.package.name -Version $Config.package.version
+New-RuntimeAssemblyDefinition -Path "$ProjectRoot\Runtime" -OrganizationName $AssemblyDefinitionOrganizationName -PackageName ($Config.package.displayName -replace ' ','')
+New-EditorAssemblyDefinition -Path "$ProjectRoot\Editor" -OrganizationName $AssemblyDefinitionOrganizationName -PackageName $AssemblyDefinitionPackageName
+New-EditorTestsAssemblyDefinition -Path "$ProjectRoot\Tests\Editor" -OrganizationName $AssemblyDefinitionOrganizationName -PackageName $AssemblyDefinitionPackageName
+New-RuntimeTestsAssemblyDefinition -Path "$ProjectRoot\Tests\Runtime" -OrganizationName $AssemblyDefinitionOrganizationName -PackageName $AssemblyDefinitionPackageName
