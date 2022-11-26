@@ -153,6 +153,36 @@ function New-EditorTestsAssemblyDefinition($Path, $OrganizationName, $PackageNam
     New-Item -Path $Path -Name "$($Name).asmdef" -ItemType File -Value $Content -Force
 }
 
+function New-RuntimeTestsAssemblyDefinition($Path, $OrganizationName, $PackageName) {
+    $Name = "$($OrganizationName).$($PackageName).Tests.Runtime"
+    $Content = @"
+{
+    `"name`": `"$($Name)`",
+    `"rootNamespace`": `"$($Name)`",
+    `"references`": [
+        `"UnityEngine.TestRunner`",
+        `"UnityEditor.TestRunner`"
+    ],
+    `"includePlatforms`": [],
+    `"excludePlatforms`": [],
+    `"allowUnsafeCode`": false,
+    `"overrideReferences`": true,
+    `"precompiledReferences`": [
+        `"nunit.framework.dll`"
+    ],
+    `"autoReferenced`": false,
+    `"defineConstraints`": [
+        `"UNITY_INCLUDE_TESTS`"
+    ],
+    `"versionDefines`": [],
+    `"noEngineReferences`": false
+}
+
+"@
+
+    New-Item -Path $Path -Name "$($Name).asmdef" -ItemType File -Value $Content -Force
+}
+
 # Setup configuration is defined in a single setup.json file
 $Config = Get-Content ./setup.json | ConvertFrom-Json
 
@@ -169,3 +199,4 @@ New-PackageJson -Path $ProjectRoot -OrganizationName $Config.organization.name -
 New-RuntimeAssemblyDefinition -Path "$ProjectRoot\Runtime" -OrganizationName $AssemblyDefinitionOrganizationName -PackageName ($Config.package.displayName -replace ' ','')
 New-EditorAssemblyDefinition -Path "$ProjectRoot\Editor" -OrganizationName $AssemblyDefinitionOrganizationName -PackageName $AssemblyDefinitionPackageName
 New-EditorTestsAssemblyDefinition -Path "$ProjectRoot\Tests\Editor" -OrganizationName $AssemblyDefinitionOrganizationName -PackageName $AssemblyDefinitionPackageName
+New-RuntimeTestsAssemblyDefinition -Path "$ProjectRoot\Tests\Runtime" -OrganizationName $AssemblyDefinitionOrganizationName -PackageName $AssemblyDefinitionPackageName
