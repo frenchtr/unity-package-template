@@ -50,8 +50,8 @@ function New-PackageJson($Path, $OrganizationName, $PackageName, $Version) {
     New-Item -Path $Path -Name package.json -ItemType File -Value $Content -Force
 }
 
-function New-RuntimeAssemblyDefinition($Path, $OrganizationDisplayName, $PackageDisplayName) {
-    $Name = "$($OrganizationDisplayName).$($PackageDisplayName).Runtime"
+function New-RuntimeAssemblyDefinition($Path, $OrganizationName, $PackageName) {
+    $Name = "$($OrganizationName).$($PackageName).Runtime"
     $Content = @"
 {
     `"name`": `"$($Name)`",
@@ -73,8 +73,8 @@ function New-RuntimeAssemblyDefinition($Path, $OrganizationDisplayName, $Package
     New-Item -Path $Path -Name "$($Name).asmdef" -ItemType File -Value $Content -Force
 }
 
-function New-RuntimeAssemblyDefinition($Path, $OrganizationDisplayName, $PackageDisplayName) {
-    $Name = "$($OrganizationDisplayName).$($PackageDisplayName).Runtime"
+function New-RuntimeAssemblyDefinition($Path, $OrganizationName, $PackageName) {
+    $Name = "$($OrganizationName).$($PackageName).Runtime"
     $Content = @"
 {
     `"name`": `"$($Name)`",
@@ -96,8 +96,8 @@ function New-RuntimeAssemblyDefinition($Path, $OrganizationDisplayName, $Package
     New-Item -Path $Path -Name "$($Name).asmdef" -ItemType File -Value $Content -Force
 }
 
-function New-EditorAssemblyDefinition($Path, $OrganizationDisplayName, $PackageDisplayName) {
-    $Name = "$($OrganizationDisplayName).$($PackageDisplayName).Editor"
+function New-EditorAssemblyDefinition($Path, $OrganizationName, $PackageName) {
+    $Name = "$($OrganizationName).$($PackageName).Editor"
     $Content = @"
 {
     `"name`": `"$($Name)`",
@@ -125,12 +125,14 @@ function New-EditorAssemblyDefinition($Path, $OrganizationDisplayName, $PackageD
 $Config = Get-Content ./setup.json | ConvertFrom-Json
 
 # Shared variables
-$CurrentYear = (Get-Date | Select-Object -ExpandProperty Year)
 $ProjectRoot = $PSScriptRoot
+$CurrentYear = (Get-Date | Select-Object -ExpandProperty Year)
+$AssemblyDefinitionOrganizationName = ($Config.organization.displayName -replace ' ','')
+$AssemblyDefinitionPackageName = ($Config.package.displayName -replace ' ','')
 
 # Procedure logic
 New-ReadMe -Path $ProjectRoot -PackageName $Config.package.displayName -PackageDescription $Config.package.description
 New-License -Path $ProjectRoot -CopyrightYear $CurrentYear -CopyrightBearer $Config.author.name
 New-PackageJson -Path $ProjectRoot -OrganizationName $Config.organization.name -PackageName $Config.package.name -Version $Config.package.version
-New-RuntimeAssemblyDefinition -Path "$ProjectRoot\Runtime" -OrganizationDisplayName ($Config.organization.displayName -replace ' ','') -PackageDisplayName ($Config.package.displayName -replace ' ','')
-New-EditorAssemblyDefinition -Path "$ProjectRoot\Editor" -OrganizationDisplayName ($Config.organization.displayName -replace ' ','') -PackageDisplayName ($Config.package.displayName -replace ' ','')
+New-RuntimeAssemblyDefinition -Path "$ProjectRoot\Runtime" -OrganizationName $AssemblyDefinitionOrganizationName -PackageName ($Config.package.displayName -replace ' ','')
+New-EditorAssemblyDefinition -Path "$ProjectRoot\Editor" -OrganizationName $AssemblyDefinitionOrganizationName -PackageName $AssemblyDefinitionPackageName
