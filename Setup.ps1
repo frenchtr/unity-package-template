@@ -47,7 +47,7 @@ function New-PackageJson($Path, $OrganizationName, $PackageName, $Version) {
 
 "@
 
-New-Item -Path $Path -Name package.json -ItemType File -Value $Content -Force
+    New-Item -Path $Path -Name package.json -ItemType File -Value $Content -Force
 }
 
 function New-RuntimeAssemblyDefinition($Path, $OrganizationDisplayName, $PackageDisplayName) {
@@ -73,6 +73,28 @@ function New-RuntimeAssemblyDefinition($Path, $OrganizationDisplayName, $Package
     New-Item -Path $Path -Name "$($Name).asmdef" -ItemType File -Value $Content -Force
 }
 
+function New-RuntimeAssemblyDefinition($Path, $OrganizationDisplayName, $PackageDisplayName) {
+    $Name = "$($OrganizationDisplayName).$($PackageDisplayName).Runtime"
+    $Content = @"
+{
+    `"name`": `"$($Name)`",
+    `"rootNamespace`": `"$($Name)`",
+    `"references`": [],
+    `"includePlatforms`": [],
+    `"excludePlatforms`": [],
+    `"allowUnsafeCode`": false,
+    `"overrideReferences`": false,
+    `"precompiledReferences`": [],
+    `"autoReferenced`": true,
+    `"defineConstraints`": [],
+    `"versionDefines`": [],
+    `"noEngineReferences`": false
+}
+
+"@
+
+    New-Item -Path $Path -Name "$($Name).asmdef" -ItemType File -Value $Content -Force
+}
 
 # Setup configuration is defined in a single setup.json file
 $Config = Get-Content ./setup.json | ConvertFrom-Json
