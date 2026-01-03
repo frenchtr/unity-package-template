@@ -1,4 +1,26 @@
 {
     "name": "com.travisrfrench.unity-package-template",
-    "version": "0.0.0"
+    "displayName": "Unity Package Template",
+    "version": "0.1.0",
+    "description": "A template for building UPM packages in Unity.",
+    "author": {
+        "name": "Travis R. French"
+    },
+    "homepage": "https://github.com/frenchtr/unity-package-template.git",
+    "keywords": [
+        "Unity",
+        "Package",
+        "Manager",
+        "Template",
+        "UPM"
+    ],
+    "dependencies": {},
+    "samples": [
+        {
+            "displayName": "Example Sample",
+            "description": "An example that shows how to setup samples.",
+            "path": "Samples~/ExampleSample"
+        }
+    ],
+    "license": "See <LICENSE.md>"
 }
